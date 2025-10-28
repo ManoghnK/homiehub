@@ -71,15 +71,15 @@ Airflow’s native logging system is enhanced with custom notifications and log 
 
 ### Example Notifications and Logs:
 
-#### ✅ Successful Completion Email
+####  Successful Completion Email
 ![ETL Completion](assets/3_email_logging1.jpg)
 > “ETL Completed Successfully – Processed 25 Rows.”
 
-#### ⚠️ Failure Alert Email
+####  Failure Alert Email
 ![Airflow Failure Alert](assets/4_email_log2.jpg)
 > Email Operator alerts triggered on failed runs with detailed exception trace.
 
-#### 📦 ETL Log Attachments
+####  ETL Log Attachments
 ![ETL Logs](assets/5_email_log3.jpg)
 > All task logs (attempt logs per operator) automatically attached for audit and troubleshooting.
 
