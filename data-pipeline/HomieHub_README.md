@@ -1,4 +1,3 @@
-
 # HomieHub ETL Data Pipeline
 
 ## 1. Project Overview
@@ -13,6 +12,8 @@ The central orchestrator is the **Airflow DAG**: `homiehub_data_pipeline.py`.
 - **Tasks:** Extract → Transform → Save → Push Summary → Email Notification
 - **Key Outputs:** Processed CSVs stored under `/data/processed/`
 - **Scheduling:** Daily (configurable), with retries and email alerts
+- **Visualization:**
+
 ![](assets/2_homiehub_data_pipeline-graph.png)
 
 This DAG manages data flow dependencies, ensuring reliable task execution and logging at every stage.
@@ -71,7 +72,7 @@ Airflow’s native logging system is enhanced with custom notifications and log 
 
 ### Example Notifications and Logs:
 
-####  Successful Completion Email
+#### Successful Completion Email
 ![ETL Completion](assets/3_email_logging1.jpg)
 > “ETL Completed Successfully – Processed 25 Rows.”
 
@@ -235,3 +236,77 @@ HomieHub’s MLOps pipeline demonstrates a **fully automated, modular, and repro
 The system successfully processes raw, unstructured text into normalized, verified datasets ready for machine learning and analytical modeling.
 
 This implementation aligns with industry MLOps best practices and covers every critical pipeline component from **data ingestion to orchestration and monitoring**.
+
+
+## **Reproducing This Project from GitHub**
+
+1. **Clone the repository** and navigate into it:
+
+   ```bash
+   git clone <your_repo_url>.git
+   cd homiehub
+   ```
+
+2. **Run the setup script** to install dependencies and prepare the environment:
+
+   ```bash
+   bash setup.sh
+   ```
+
+3. **Follow the printed next steps**:
+
+   ```bash
+   echo "Next steps:"
+   echo "1. Ensure your WhatsApp export or structured housing CSV is placed under: data/raw/"
+   echo "2. Initialize Airflow (one-time setup): docker-compose up airflow-init"
+   echo "3. Start Airflow services: docker-compose up -d"
+   echo "4. Open Airflow UI: http://localhost:8080"
+   ```
+
+4. **Add your input data**:  
+   Place your file in the correct folder:
+   ```bash
+   cp <your_whatsapp_export_or_structured_listings.csv> data/raw/
+   ```
+
+   - If you’re using a **WhatsApp chat export**, the extraction module will parse it automatically.  
+   - If you already have a **structured CSV**, the pipeline will skip extraction and proceed to ingestion and transformation.
+
+5. **Trigger the DAG**:
+
+   - Open the Airflow UI at [http://localhost:8080](http://localhost:8080)  
+   - Navigate to **`homiehub_data_pipeline`**  
+   - Toggle it **ON** and click **Trigger DAG**
+
+6. **Monitor pipeline progress**:
+
+   - Task logs are stored under `logs/` and viewable in the Airflow UI  
+   - Success/failure summary emails (if configured) will be sent automatically to the alert email configured in your `.env` file
+
+7. **Verify output artifacts**:
+
+   - Extracted structured file: `data/raw/structured_listings_nlp.csv`  
+   - Processed final file: `data/processed/listings_processed.csv`  
+   - DAG run logs: `logs/dag_id=homiehub_data_pipeline/`  
+
+8. **DVC data versioning** (if enabled in the project):
+
+   - Pull tracked dataset versions before re-running the DAG:
+     ```bash
+     dvc pull
+     ```
+   - Push updates after successful runs:
+     ```bash
+     dvc add data/raw data/processed
+     dvc push
+     ```
+
+9. **Reproduce a clean deterministic run**:
+   ```bash
+   docker-compose down -v    # stop containers and remove Airflow state
+   rm -rf logs/* data/processed/*
+   docker-compose up -d --build
+   # Trigger the DAG again in the Airflow UI → outputs should match the previous run
+   ```
+
+---
