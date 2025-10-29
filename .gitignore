@@ -2,3 +2,6 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*Account_Key.json
+.DS_Store
+GCP_Account_Key.json
