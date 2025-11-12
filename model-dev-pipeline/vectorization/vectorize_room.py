@@ -1,18 +1,39 @@
 """
 Room vectorization module for HomieHub roommate matching.
-Converts room listings into normalized 11-dimensional vectors.
+Converts room listings into weighted 11-dimensional vectors for Firestore.
 """
 
 import numpy as np
 from typing import Dict
 
 
+# Global weight configuration (must match vectorize_user.py)
+WEIGHTS = np.array([
+    3.0,  # index 0: latitude (location - high priority)
+    3.0,  # index 1: longitude (location - high priority)
+    4.0,  # index 2: gender (STRICT - highest priority)
+    3.0,  # index 3: budget (high priority)
+    4.0,  # index 4: lease_duration (STRICT - highest priority)
+    2.0,  # index 5: room_type (medium priority)
+    1.0,  # index 6: bathroom (low priority)
+    1.0,  # index 7: food (low priority)
+    1.0,  # index 8: alcohol (low priority)
+    1.0,  # index 9: smoke (low priority)
+    2.0   # index 10: utilities (medium priority)
+], dtype=np.float32)
+
+
 def vectorize_room(room_data: Dict, location_coords: Dict[str, tuple]) -> np.ndarray:
     """
-    Generate an 11-dimensional vector from room listing.
+    Generate a weighted 11-dimensional vector from room listing.
+    
+    Weights are applied during vectorization for efficient Firestore similarity matching.
+    The resulting weighted vectors can be directly compared using cosine similarity
+    or Euclidean distance in Firestore.
     
     Vector structure: [lat, lon, gender, rent, lease_duration, room_type,
                       bathroom, food, alcohol, smoke, utilities]
+    All values are normalized to [0,1] then multiplied by their respective weights.
     
     Args:
         room_data: Dictionary containing room details with keys:
@@ -32,7 +53,7 @@ def vectorize_room(room_data: Dict, location_coords: Dict[str, tuple]) -> np.nda
         location_coords: Dictionary mapping location names to (lat, lon) tuples
     
     Returns:
-        np.ndarray: 11-dimensional normalized vector (float32)
+        np.ndarray: 11-dimensional weighted vector (float32)
         
     Example:
         >>> location_coords = {"Cambridge": (42.3736, -71.1097)}
@@ -110,7 +131,13 @@ def vectorize_room(room_data: Dict, location_coords: Dict[str, tuple]) -> np.nda
     # 10. Utilities included
     utilities = min(1.0, len(room_data.get('utilities_included', [])) / 4.0)
     
-    return np.array([
+    # Create normalized vector (before weighting)
+    normalized_vector = np.array([
         lat_normalized, lon_normalized, gender, rent_normalized, lease_normalized,
         room_type, bathroom, food, alcohol, smoke, utilities
     ], dtype=np.float32)
+    
+    # Apply weights to create final weighted vector
+    weighted_vector = normalized_vector * WEIGHTS
+    
+    return weighted_vector
