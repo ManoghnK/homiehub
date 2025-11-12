@@ -4,7 +4,46 @@ Converts user preferences into weighted 11-dimensional vectors for Firestore.
 """
 
 import numpy as np
-from typing import Dict
+from typing import Dict, Optional
+
+
+# Boston area location coordinates (within ~5 miles of downtown)
+# Coordinates represent approximate neighborhood centers
+LOCATION_COORDS = {
+    # Core Boston neighborhoods
+    "Boston": (42.3601, -71.0589),
+    "Downtown Boston": (42.3551, -71.0603),
+    "Back Bay": (42.3505, -71.0763),
+    "South End": (42.3414, -71.0742),
+    "North End": (42.3647, -71.0542),
+    "Beacon Hill": (42.3588, -71.0707),
+    "Fenway": (42.3467, -71.0972),
+    "South Boston": (42.3334, -71.0495),
+    "East Boston": (42.3713, -71.0395),
+    "Charlestown": (42.3782, -71.0602),
+    "Roxbury": (42.3318, -71.0828),
+    "Jamaica Plain": (42.3099, -71.1206),
+    "Mission Hill": (42.3331, -71.1008),
+    
+    # Cambridge (nearby areas)
+    "Cambridge": (42.3736, -71.1097),
+    "Central Square": (42.3657, -71.1040),
+    "Kendall Square": (42.3656, -71.0857),
+    "Harvard Square": (42.3736, -71.1190),
+    
+    # Somerville (nearby areas)
+    "Somerville": (42.3876, -71.0995),
+    "Union Square": (42.3793, -71.0936),
+    "Davis Square": (42.3967, -71.1226),
+    
+    # Brookline
+    "Brookline": (42.3318, -71.1212),
+    "Coolidge Corner": (42.3421, -71.1211),
+    
+    # Allston/Brighton
+    "Allston": (42.3543, -71.1312),
+    "Brighton": (42.3481, -71.1509),
+}
 
 
 # Global weight configuration
@@ -25,7 +64,10 @@ WEIGHTS = np.array([
 ], dtype=np.float32)
 
 
-def vectorize_user(user_data: Dict, location_coords: Dict[str, tuple]) -> np.ndarray:
+def vectorize_user(
+    user_data: Dict,
+    location_coords: Optional[Dict[str, tuple]] = None
+) -> np.ndarray:
     """
     Generate a weighted 11-dimensional vector from user preferences.
     
@@ -50,15 +92,15 @@ def vectorize_user(user_data: Dict, location_coords: Dict[str, tuple]) -> np.nda
             - lifestyle_smoke: str - "No", "Outside Only", or "Yes"
             - utilities_preference: List[str] - List of desired utilities
             
-        location_coords: Dictionary mapping location names to (lat, lon) tuples
+        location_coords: Optional dictionary mapping location names to (lat, lon) tuples.
+                        If None, uses built-in LOCATION_COORDS for Boston area.
     
     Returns:
         np.ndarray: 11-dimensional weighted vector (float32)
         
     Example:
-        >>> location_coords = {"Cambridge": (42.3736, -71.1097)}
         >>> user = {
-        ...     "preferred_locations": ["Cambridge"],
+        ...     "preferred_locations": ["Cambridge", "Somerville"],
         ...     "gender_preference": "Any",
         ...     "budget_max": 1200,
         ...     "lease_duration_months": 6,
@@ -69,10 +111,14 @@ def vectorize_user(user_data: Dict, location_coords: Dict[str, tuple]) -> np.nda
         ...     "lifestyle_smoke": "No",
         ...     "utilities_preference": ["Heat", "Water"]
         ... }
-        >>> vector = vectorize_user(user, location_coords)
+        >>> vector = vectorize_user(user)  # Uses built-in Boston coordinates
         >>> vector.shape
         (11,)
     """
+    # Use built-in coordinates if none provided
+    if location_coords is None:
+        location_coords = LOCATION_COORDS
+    
     # Normalization constants
     LAT_MIN, LAT_MAX = 42.25, 42.45
     LON_MIN, LON_MAX = -71.20, -71.00
@@ -101,7 +147,7 @@ def vectorize_user(user_data: Dict, location_coords: Dict[str, tuple]) -> np.nda
             lats.append(lat)
             lons.append(lon)
     
-    # Default if no valid locations
+    # Default if no valid locations (Downtown Boston)
     if not lats:
         lats, lons = [42.3601], [-71.0589]
     
