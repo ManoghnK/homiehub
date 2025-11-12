@@ -5,3 +5,5 @@ __pycache__/
 *Account_Key.json
 .DS_Store
 GCP_Account_Key.json
+**/credentials/
+**/test.py
