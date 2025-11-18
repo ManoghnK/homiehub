@@ -248,7 +248,7 @@ def main():
     
     if USE_CLOUD:
         # Cloud configuration
-        BUCKET_NAME = "homiehub"
+        BUCKET_NAME = "homiehubbucket"
         SERVICE_ACCOUNT_KEY = "./GCP_Account_Key.json"
         DATA_PATH = "cleaned/2024-11-03/homiehub_listings.csv"  # Path within bucket
         

@@ -39,6 +39,6 @@ def upload_csv_with_date_folder(local_file_path, bucket_name, service_account_ke
 if __name__ == "__main__":
     upload_csv_with_date_folder(
         local_file_path="./data/raw/homiehub_listings.csv",
-        bucket_name="homiehub",
+        bucket_name="homiehubbucket",
         service_account_key_path="./GCP_Account_Key.json"
     )

@@ -13,6 +13,7 @@ from airflow.utils.email import send_email
 from google.cloud import storage
 import tempfile
 from google.cloud import storage
+from datetime import datetime
 
 # Add project root to sys.path to allow imports
 project_root = Path(__file__).resolve().parents[1]
@@ -24,7 +25,7 @@ from src.utils.logger import setup_logger
 logger = setup_logger(__name__)
 
 # ---------- Configuration ----------
-GCS_BUCKET = "homiehub"
+GCS_BUCKET = "homiehubbucket"
 GCP_KEY_PATH = "./GCP_Account_Key.json"  # Update this path as needed
 RAW_FILENAME = "homiehub_listings.csv"
 PROCESSED_FILENAME = "homiehub_listings_processed.csv"
@@ -200,7 +201,7 @@ def send_email_task(**kwargs):
         if 'gcs_path' in summary:
             try:
                 # Parse the GCS path
-                gcs_path = summary['gcs_path']  # gs://homiehub/processed/2025-10-29/homiehub_listings_processed_20251029_162055.csv
+                gcs_path = summary['gcs_path']
                 
                 # Extract bucket and blob path
                 if gcs_path.startswith('gs://'):
@@ -296,8 +297,7 @@ def send_email_with_attachment_simple(**kwargs):
         raise ValueError(f"Invalid GCS path: {gcs_path}")
     
     # Extract bucket and blob names
-    # gs://homiehub/processed/2025-10-29/homiehub_listings_processed_20251029_162055.csv
-    path_without_prefix = gcs_path[5:]  # Remove 'gs://'
+    path_without_prefix = gcs_path[5:]
     bucket_name, blob_path = path_without_prefix.split('/', 1)
     
     # Set up GCS client
@@ -453,7 +453,7 @@ with DAG(
     dag_id='homiehub_data_pipeline',
     default_args=default_args,
     description='ETL DAG with email notification',
-    start_date=datetime(2025, 10, 29),
+    start_date=datetime.today(),
     schedule=None,
     catchup=False,
     max_active_runs=1,

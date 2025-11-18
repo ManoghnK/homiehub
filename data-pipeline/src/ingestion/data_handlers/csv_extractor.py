@@ -11,7 +11,7 @@ def read_csv_from_gcs(bucket_name, filename, service_account_key_path):
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = service_account_key_path
     
     # Get today's date dynamically
-    today = datetime.now().strftime('%Y-%m-28')
+    today = datetime.now().strftime('%Y-%m-%d')
     
     # Construct blob path with today's date
     blob_name = f"raw/{today}/{filename}"

@@ -25,7 +25,7 @@ def run_etl() -> Path:
         # Step 1: Extract from GCS
         logger.info("Step 1/4: Extracting data from GCS")
         df = read_csv_from_gcs(
-            bucket_name="homiehub",
+            bucket_name="homiehubbucket",
             filename="homiehub_listings.csv",
             service_account_key_path="./GCP_Account_Key.json"
         )
@@ -68,11 +68,11 @@ def run_etl() -> Path:
         out_path = upload_df_to_gcs(
             df=tdf,
             filename="homiehub_listings_processed.csv",
-            bucket_name="homiehub",
+            bucket_name="homiehubbucket",
             service_account_key_path="./GCP_Account_Key.json",
         )
         
-        logger.info(f"✓ Loaded to: gs://homiehub/{out_path}")
+        logger.info(f"✓ Loaded to: gs://homiehubbucket/{out_path}")
         logger.info("=" * 60)
         logger.info("ETL Pipeline Completed Successfully!")
         logger.info("=" * 60)
