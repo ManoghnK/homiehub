@@ -1,8 +1,11 @@
 name: Test Suite
 
 on:
+  push:
+    branches: [ main, testing-ci-cd ]
   pull_request:
     types: [opened, synchronize, reopened]
+    branches: [ main ]
 
 env:
   PYTHON_VERSION: '3.11'
@@ -28,8 +31,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pytest pytest-cov
+        pip install pandas numpy google-cloud-storage pytest pytest-cov
     
     - name: Set up GCP credentials
       env:
