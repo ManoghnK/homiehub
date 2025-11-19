@@ -83,10 +83,29 @@ homiehub/
 - **Data Quality**: Schema validation, DVC versioning
 - **Monitoring**: Email notifications, comprehensive logging
 
-### AI Model Pipeline (Next task  - In Development)
-- Models for semantic matching
-- Context-aware recommendations
-- Preference learning algorithms
+### [AI Model Pipeline](model-pipeline/readme.md) (Implemented)
+
+The `model-pipeline/` module handles AI-driven roommate matching using semantic search, embeddings, and preference-aware ranking. This pipeline is designed to be fully MLOps-compliant, supporting modular model updates, batch and real-time inference, and scalable deployment.
+
+**Model Pipeline Capabilities**
+1. Semantic Embedding Models
+- Sentence Transformer–based vectorization
+- Room & user representation learning
+- Cosine similarity + hybrid BM25 reranking
+2. LLM Agent for Context-Aware Scoring
+- Evaluates roommate compatibility using LLM-based reasoning
+- Tools-enabled evaluation (budget alignment, commute, noise tolerance, habits)
+- Supports OpenAI API + local LLM deployments
+3. Recommendation Engine
+- Top-K candidate retrieval using vector search
+- LLM reranker for personalized scoring
+- Real-time recommendation function via Cloud Functions
+4. MLOps Features
+- Dockerized microservices for all three components
+- GitHub Actions-based CI/CD 
+- Configurable deployment targets: Cloud Run / GKE
+- Monitoring & metrics hooks (Prometheus-ready)
+
 
 ### Web Platform (Planned)
 - .edu authentication via Auth0
@@ -99,7 +118,7 @@ homiehub/
 - [**Data Pipeline Documentation**](./data-pipeline/README.md) - Complete data and ETL pipeline guide
 - [**Setup Guide**](./data-pipeline/docs/setup_guide.md) - Installation and configuration
 - [**Scripts Usage**](./data-pipeline/docs/scripts_usage.md) - Automation scripts guide
-
+- [**Model Pipeline Documentation**](./model-pipeline/README.md) - Complete model pipeline guide
 
 ## Quick Start
 
@@ -209,7 +228,7 @@ MLOps course mentors, Apache Airflow, GCP, and the open-source community.
 For questions or collaboration:
 - Create an [issue](https://github.com/homiehub/homiehub/issues)
 - Review [data pipeline documentation](./data-pipeline/README.md)
-
+- Review [model pipeline documentation](./model-pipeline/README.md)
 
 ---
 > For comprehensive details about the implemented ETL system, refer to the [Data Pipeline Documentation](/data-pipeline/README.md), the [Setup Guide](/data-pipeline/docs/setup_guide.md), and the [Scripts Usage Guide](/data-pipeline/docs/scripts_usage.md).
