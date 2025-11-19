@@ -1,0 +1,49 @@
+name: Test Suite
+
+on:
+  push:
+    branches: [ main, testing-ci-cd ]
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [ main ]
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        test-suite: [extraction, loading, transformation]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pandas numpy google-cloud-storage pytest pytest-cov
+    
+    - name: Set up GCP credentials
+      env:
+        GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+      run: |
+        echo "$GCP_SERVICE_ACCOUNT_KEY" > data-pipeline/GCP_Account_Key.json
+    
+    - name: Run ${{ matrix.test-suite }} tests
+      working-directory: data-pipeline
+      run: |
+        pytest test/test_data_${{ matrix.test-suite }}.py -v --tb=short
+    
+    - name: Clean up
+      if: always()
+      run: rm -f data-pipeline/GCP_Account_Key.json
